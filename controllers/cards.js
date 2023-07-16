@@ -1,10 +1,10 @@
 const Card = require('../models/card');
 
 class CardError extends Error {
-  constructor(message) {
-    super(message);
+  constructor(m) {
+    super(m);
     this.message = {
-      'message': message,
+      message: m,
     };
   }
 
@@ -66,10 +66,9 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
     .then((card) => {
-      if (!card) {
-        return Promise.reject('Карточка с указанным _id не найдена');
-      }
-      res.send({ data: card });
+      card
+        ? res.send({ data: card })
+        : Promise.reject('Карточка с указанным _id не найдена');
     })
     .catch((m = '') => {
       cardError(m).indicateErr();

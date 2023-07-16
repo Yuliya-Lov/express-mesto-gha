@@ -1,10 +1,10 @@
 const User = require('../models/user');
 
 class UserError extends Error {
-  constructor(message) {
-    super(message);
+  constructor(m) {
+    super(m);
     this.message = {
-      'message': message,
+      message: m,
     };
   }
 
