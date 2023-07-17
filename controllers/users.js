@@ -14,7 +14,7 @@ class UserError extends Error {
       this.statusCode = 400;
       return;
     }
-    if (this.message.message === 'Пользователь по указанному _id не найден') {
+    if ((this.message.message === 'Пользователь по указанному _id не найден') || this.message.message.toString().startsWith('CastError: Cast to ObjectId failed for value')) {
       this.name = 'UserNotFoundError';
       this.statusCode = 404;
       return;
@@ -38,7 +38,6 @@ const userError = (message) => {
 const getAllUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      console.log(users);
       res.send({ data: users });
     })
     .catch((m = '') => {
@@ -51,9 +50,7 @@ const getAllUsers = (req, res) => {
 const getUser = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
-      user
-        ? res.send({ data: user })
-        : Promise.reject('Пользователь по указанному _id не найден');
+      res.send({ data: user })
     })
     .catch((m = '') => {
       userError(m).indicateErr();
@@ -64,50 +61,45 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  name && about && avatar
+  ((!!name && !!about && !!avatar)
     ? User.create({ name, about, avatar })
-    : Promise.reject('Переданы некорректные данные')
-      .then((user) => {
-        res.send({ data: user });
-      })
-      .catch((m = '') => {
-        userError(m).indicateErr();
-        res.status = userError(m).statusCode;
-        res.send(userError(m).message);
-      });
+    : Promise.reject('Переданы некорректные данные'))
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((m = '') => {
+      userError(m).indicateErr();
+      res.status = userError(m).statusCode;
+      res.send(userError(m).message);
+    });
 };
 
 const updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  name && about
-    ? User.findByIdAndUpdate(req.user._id, { name, about })
-    : Promise.reject('Переданы некорректные данные')
-      .then((user) => {
-        user
-          ? res.send({ data: user })
-          : Promise.reject('Пользователь по указанному _id не найден');
-      })
-      .catch((m = '') => {
-        userError(m).indicateErr();
-        res.status = userError(m).statusCode;
-        res.send(userError(m).message);
-      });
+  ((!!name || !!about)
+    ? User.findByIdAndUpdate(req.user._id, { name, about }, {
+      new: true,
+      upsert: true,
+    })
+    : Promise.reject('Переданы некорректные данные'))
+    .then((user) => res.send({ data: user }))
+    .catch((m = '') => {
+      userError(m).indicateErr();
+      res.status = userError(m).statusCode;
+      res.send(userError(m).message);
+    });
 };
 
 const updateUserAvatar = (req, res) => {
-  req.body.avatar
+  (req.body.avatar
     ? User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar })
-    : Promise.reject('Переданы некорректные данные')
-      .then((user) => {
-        user
-          ? res.send({ data: user })
-          : Promise.reject('Пользователь по указанному _id не найден');
-      })
-      .catch((m = '') => {
-        userError(m).indicateErr();
-        res.status = userError(m).statusCode;
-        res.send(userError(m).message);
-      });
+    : Promise.reject('Переданы некорректные данные'))
+    .then((user) => res.send({ data: user }))
+    .catch((m = '') => {
+      userError(m).indicateErr();
+      res.status = userError(m).statusCode;
+      res.send(userError(m).message);
+    });
 };
 
 module.exports = {
