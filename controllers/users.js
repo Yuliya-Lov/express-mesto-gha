@@ -27,7 +27,7 @@ const getUser = (req, res) => {
         : res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
     })
     .catch((err) => {
-      if (err.name === 'UncorrectDataUserError') {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
         res.status(400).send({ message: `${err.message}` });
       } else if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
@@ -39,17 +39,10 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  console.log(name, about, avatar);
   (name && about && avatar
-    ? User.create({ name, about, avatar },/*  {
-      versionKey: false,
-    } */)
+    ? User.create({ name, about, avatar })
     : Promise.reject(UncorrectDataUserError))
-    .then((user) => {
-      user
-        ? res.send({ data: user })
-        : res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
-    })
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       console.log(err);
       if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
@@ -94,7 +87,7 @@ const updateUserAvatar = (req, res) => {
     : Promise.reject(UncorrectDataUserError))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'UncorrectDataUserError') {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
         res.status(400).send({ message: `${err.message}` });
       } else {
         res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });

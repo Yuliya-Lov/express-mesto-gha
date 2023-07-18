@@ -1,120 +1,104 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 
-class CardError extends Error {
-  constructor(m) {
-    super(m);
-    this.message = {
-      message: m,
-    };
-  }
+const CardNotFoundError = new Error('Карточка  с указанным _id не найдена');
+CardNotFoundError.name = 'CardNotFoundError';
 
-  getProperties() {
-    if (this.message.message === 'Переданы некорректные данные') {
-      this.name = 'UncorrectDataCardError';
-      this.statusCode = 400;
-      return;
-    }
-    if (this.message.message === 'Карточка с указанным _id не найдена') {
-      this.name = 'CardNotFoundError';
-      this.statusCode = 404;
-      return;
-    }
-    this.message.message = 'Произошла ошибка запроса данных карточки';
-    this.name = 'DefaultCardError';
-    this.statusCode = 500;
-  }
-
-  indicateErr() {
-    console.log(`Ошибка: ${this.name}, код ошибки: ${this.statusCode}`);
-  }
-}
-
-const cardError = (message) => {
-  const err = new CardError(message);
-  err.getProperties();
-  return err;
-};
+const UncorrectDataCardError = new Error('Переданы некорректные данные');
+UncorrectDataCardError.name = 'UncorrectDataCardError';
 
 const getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch((m = '') => {
-      cardError(m).indicateErr();
-      res.status = cardError(m).statusCode;
-      res.send(cardError(m).message);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
+        res.status(400).send({ message: `${err.message}` });
+      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
+        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+      }
     });
 };
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  name && link
+  (name && link
     ? Card.create({ name, link })
-    : Promise.reject('Переданы некорректные данные')
-      .then((card) => {
-        console.log(card);
-        res.send({ data: card });
-      })
-      .catch((m = '') => {
-        cardError(m).indicateErr();
-        res.status = cardError(m).statusCode;
-        res.send(cardError(m).message);
-      });
+    : res.status(400).send({ message: `${err.message}` }))
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
+        res.status(400).send({ message: `${err.message}` });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+      }
+    })
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+  (mongoose.Types.ObjectId.isValid(req.params.id)
+    ? Card.findByIdAndRemove(req.params.id)
+    : Promise.reject(UncorrectDataCardError))
     .then((card) => {
       card
         ? res.send({ data: card })
-        : Promise.reject('Карточка с указанным _id не найдена');
+        : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
     })
-    .catch((m = '') => {
-      cardError(m).indicateErr();
-      res.status = cardError(m).statusCode;
-      res.send(cardError(m).message);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
+        res.status(400).send({ message: `${err.message}` });
+      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
+        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+      }
     });
 };
 
 const likeCard = (req, res) => {
-  req.user._id
-    ? Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    )
-    : Promise.reject('Переданы некорректные данные')
-      .then((card) => {
-        card
-          ? res.send({ data: card })
-          : Promise.reject('Карточка с указанным _id не найдена');
-      })
-      .catch((m = '') => {
-        cardError(m).indicateErr();
-        res.status = cardError(m).statusCode;
-        res.send(cardError(m).message);
-      });
+  Card.findByIdAndUpdate(
+    req.params.id,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((card) => {
+      card
+        ? res.send({ data: card })
+        : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
+        res.status(400).send({ message: `${err.message}` });
+      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
+        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+      }
+    });
 };
 
 const dislikeCard = (req, res) => {
-  req.user._id
-    ? Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    )
-    : Promise.reject('Переданы некорректные данные')
-      .then((card) => {
-        card
-          ? res.send({ data: card })
-          : Promise.reject('Карточка с указанным _id не найдена');
-      })
-      .catch((m = '') => {
-        cardError(m).indicateErr();
-        res.status = cardError(m).statusCode;
-        res.send(cardError(m).message);
-      });
+  Card.findByIdAndUpdate(
+    req.params.id,
+    { $pull: { likes: req.user._id } },
+    { new: true })
+    .then((card) => {
+      card
+        ? res.send({ data: card })
+        : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
+        res.status(400).send({ message: `${err.message}` });
+      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
+        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+      }
+    });
 };
 
 module.exports = {
