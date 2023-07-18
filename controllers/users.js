@@ -18,14 +18,18 @@ const getAllUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  User.findById(req.params.id)
+  (mongoose.Types.ObjectId.isValid(req.params.id)
+    ? User.findById(req.params.id)
+    : Promise.reject(UncorrectDataUserError))
     .then((user) => {
       user
         ? res.send({ data: user })
         : res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
+        res.status(400).send({ message: `${err.message}` });
+      } else if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       } else {
         res.status(500).send({ message: 'На сервере произошла ошибка' });
@@ -40,6 +44,7 @@ const createUser = (req, res) => {
     : Promise.reject(UncorrectDataUserError))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
+      console.log(err);
       if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
