@@ -1,16 +1,9 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 const {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
 } = require('../utils/errors');
-
-const CardNotFoundError = new Error('Карточка  с указанным _id не найдена');
-CardNotFoundError.name = 'CardNotFoundError';
-
-const UncorrectDataCardError = new Error('Переданы некорректные данные');
-UncorrectDataCardError.name = 'UncorrectDataCardError';
 
 const getAllCards = (req, res) => {
   Card.find({})
@@ -44,7 +37,9 @@ const deleteCard = (req, res) => {
         : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
     })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.name === 'CastError') {
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else if (err.name === 'DocumentNotFoundError') {
         res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
         res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
