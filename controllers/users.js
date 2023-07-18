@@ -13,26 +13,22 @@ const getAllUsers = (req, res) => {
       res.send({ data: users });
     })
     .catch(() => {
-      res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
 
 const getUser = (req, res) => {
-  (mongoose.Types.ObjectId.isValid(req.params.id)
-    ? User.findById(req.params.id)
-    : Promise.reject(UncorrectDataUserError))
+  User.findById(req.params.id)
     .then((user) => {
       user
         ? res.send({ data: user })
         : res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
-        res.status(400).send({ message: `${err.message}` });
-      } else if (err.name === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -44,11 +40,10 @@ const createUser = (req, res) => {
     : Promise.reject(UncorrectDataUserError))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      console.log(err);
       if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -67,7 +62,7 @@ const updateUserInfo = (req, res) => {
       } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -89,7 +84,7 @@ const updateUserAvatar = (req, res) => {
       if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
         res.status(400).send({ message: `${err.message}` });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };

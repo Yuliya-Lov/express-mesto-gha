@@ -18,7 +18,7 @@ const getAllCards = (req, res) => {
       } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
         res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -33,7 +33,7 @@ const createCard = (req, res) => {
       if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
         res.status(400).send({ message: `${err.message}` });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -53,7 +53,7 @@ const deleteCard = (req, res) => {
       } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
         res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -77,7 +77,7 @@ const likeCard = (req, res) => {
       } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
         res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -101,7 +101,7 @@ const dislikeCard = (req, res) => {
       } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
         res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
