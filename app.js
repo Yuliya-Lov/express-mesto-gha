@@ -6,6 +6,9 @@ const app = express();
 const bodyParser = require('body-parser');
 const { userRouter } = require('./routes/users');
 const { cardRouter } = require('./routes/cards');
+const {
+  HTTP_STATUS_NOT_FOUND,
+} = require('./utils/errors');
 
 mongoose.connect('mongodb://0.0.0.0:27017/mestodb', {
   useNewUrlParser: true,
@@ -24,7 +27,7 @@ app.use((req, res, next) => {
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемая страница не найдена' });
+  res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Запрашиваемая страница не найдена' });
 });
 
 app.listen(PORT, () => {

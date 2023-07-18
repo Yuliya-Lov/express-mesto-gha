@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
+const {
+  HTTP_STATUS_BAD_REQUEST,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_INTERNAL_SERVER_ERROR,
+} = require('../utils/errors');
 
 const CardNotFoundError = new Error('Карточка  с указанным _id не найдена');
 CardNotFoundError.name = 'CardNotFoundError';
@@ -12,96 +17,81 @@ const getAllCards = (req, res) => {
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
-        res.status(400).send({ message: `${err.message}` });
-      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
-        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
-      } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
-      }
+    .catch(() => {
+      res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
     });
 };
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  (name && link
-    ? Card.create({ name, link, owner: req.user._id })
-    : res.status(400).send({ message: UncorrectDataCardError.message }))
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
-        res.status(400).send({ message: `${err.message}` });
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
 
 const deleteCard = (req, res) => {
-  (mongoose.Types.ObjectId.isValid(req.params.id)
-    ? Card.findByIdAndRemove(req.params.id)
-    : Promise.reject(UncorrectDataCardError))
+  Card.findByIdAndRemove(req.params.id)
+    .orFail()
     .then((card) => {
       card
         ? res.send({ data: card })
         : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
-        res.status(400).send({ message: `${err.message}` });
-      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
-        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
 
 const likeCard = (req, res) => {
-  (mongoose.Types.ObjectId.isValid(req.params.id)
-    ? Card.findByIdAndUpdate(
-      req.params.id,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    )
-    : Promise.reject(UncorrectDataCardError))
+  Card.findByIdAndUpdate(
+    req.params.id,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
+    .orFail()
     .then((card) => {
       card
         ? res.send({ data: card })
         : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
-        res.status(400).send({ message: `${err.message}` });
-      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
-        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      if (err.name === 'CastError') {
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
 
 const dislikeCard = (req, res) => {
-  (mongoose.Types.ObjectId.isValid(req.params.id)
-    ? Card.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    )
-    : Promise.reject(UncorrectDataCardError))
+  Card.findByIdAndUpdate(
+    req.params.id,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
+    .orFail()
     .then((card) => {
-      card
-        ? res.send({ data: card })
-        : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
-        res.status(400).send({ message: `${err.message}` });
-      } else if (err.name === 'CastError' || err.name === 'CardNotFoundError') {
-        res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
+      if (err.name === 'CastError') {
+        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка  с указанным _id не найдена' });
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };

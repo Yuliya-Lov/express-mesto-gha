@@ -20,26 +20,6 @@ const getAllUsers = (req, res) => {
     });
 };
 
-/* const getUser = (req, res) => {
-  (mongoose.Types.ObjectId.isValid(req.params.id)
-    ? User.findById(req.params.id)
-    : Promise.reject(UncorrectDataUserError))
-    .then((user) => {
-      user
-        ? res.send({ data: user })
-        : res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
-        res.status(400).send({ message: `${err.message}` });
-      } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
-      } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
-}; */
-
 const getUser = (req, res) => {
   User.findById(req.params.id)
     .orFail()
@@ -56,61 +36,6 @@ const getUser = (req, res) => {
       }
     });
 };
-
-/* const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  (name && about && avatar
-    ? User.create({ name, about, avatar })
-    : Promise.reject(UncorrectDataUserError))
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      console.log(err);
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-      } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
-};
-
-const updateUserInfo = (req, res) => {
-  const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, {
-    new: true,
-    runValidators: true,
-  })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-      } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
-};
-
-const updateUserAvatar = (req, res) => {
-  (req.body.avatar
-    ? User.findByIdAndUpdate(
-      req.user._id,
-      { avatar: req.body.avatar },
-      {
-        new: true,
-        runValidators: true,
-      },
-    )
-    : Promise.reject(UncorrectDataUserError))
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
-        res.status(400).send({ message: `${err.message}` });
-      } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
-}; */
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -134,7 +59,7 @@ const updateUserInfo = (req, res) => {
   }).orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else if (err.name === 'DocumentNotFoundError') {
         res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' });
