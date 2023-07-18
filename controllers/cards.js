@@ -27,7 +27,7 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
   (name && link
     ? Card.create({ name, link })
-    : res.status(400).send({ message: `${err.message}` }))
+    : res.status(400).send({ message: UncorrectDataCardError.message }))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'UncorrectDataCardError') {
@@ -59,11 +59,13 @@ const deleteCard = (req, res) => {
 };
 
 const likeCard = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.id,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  )
+  (mongoose.Types.ObjectId.isValid(req.params.id)
+    ? Card.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { likes: req.user._id } },
+      { new: true },
+    )
+    : Promise.reject(UncorrectDataCardError))
     .then((card) => {
       card
         ? res.send({ data: card })
@@ -81,10 +83,12 @@ const likeCard = (req, res) => {
 };
 
 const dislikeCard = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.id,
-    { $pull: { likes: req.user._id } },
-    { new: true })
+  (mongoose.Types.ObjectId.isValid(req.params.id)
+    ? Card.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { likes: req.user._id } },
+      { new: true })
+    : Promise.reject(UncorrectDataCardError))
     .then((card) => {
       card
         ? res.send({ data: card })
