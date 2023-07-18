@@ -35,7 +35,7 @@ const createCard = (req, res) => {
       } else {
         res.status(500).send({ message: 'Произошла ошибка запроса данных карточки' });
       }
-    })
+    });
 };
 
 const deleteCard = (req, res) => {
@@ -87,7 +87,8 @@ const dislikeCard = (req, res) => {
     ? Card.findByIdAndUpdate(
       req.params.id,
       { $pull: { likes: req.user._id } },
-      { new: true })
+      { new: true },
+    )
     : Promise.reject(UncorrectDataCardError))
     .then((card) => {
       card

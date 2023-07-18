@@ -63,12 +63,10 @@ const updateUserInfo = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден' })
-      }
-      else if (err.name === 'ValidationError') {
+        res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
+      } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
-      }
-      else {
+      } else {
         res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });
       }
     });
@@ -76,7 +74,8 @@ const updateUserInfo = (req, res) => {
 
 const updateUserAvatar = (req, res) => {
   (req.body.avatar
-    ? User.findByIdAndUpdate(req.user._id,
+    ? User.findByIdAndUpdate(
+      req.user._id,
       { avatar: req.body.avatar },
       {
         new: true,
