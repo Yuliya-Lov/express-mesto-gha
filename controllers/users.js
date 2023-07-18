@@ -5,19 +5,14 @@ const {
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
 } = require('../utils/errors');
 
-const UserNotFoundError = new Error('Пользователь с указанным _id не найден');
-UserNotFoundError.name = 'UserNotFoundError';
-
-const UncorrectDataUserError = new Error('Переданы некорректные данные');
-UncorrectDataUserError.name = 'UncorrectDataUserError';
-
 const getAllUsers = (req, res) => {
-  User.find({}).orFail()
+  User.find({})
+    .orFail(HTTP_STATUS_BAD_REQUEST)
     .then((users) => {
       res.send({ data: users });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'HTTP_STATUS_BAD_REQUEST') {
         res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
@@ -46,7 +41,8 @@ const getAllUsers = (req, res) => {
 }; */
 
 const getUser = (req, res) => {
-  User.findById(req.params.id).orFail()
+  User.findById(req.params.id)
+    .orFail()
     .then((user) => {
       res.send({ data: user });
     })
@@ -118,10 +114,11 @@ const updateUserAvatar = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar }).orFail()
+  User
+    .create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
@@ -137,7 +134,7 @@ const updateUserInfo = (req, res) => {
   }).orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else if (err.name === 'DocumentNotFoundError') {
         res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' });
