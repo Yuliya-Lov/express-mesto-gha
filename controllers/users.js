@@ -39,8 +39,11 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  (mongoose.Types.ObjectId.isValid(name)
-    ? User.create({ name, about, avatar })
+  console.log(name, about, avatar);
+  (name && about && avatar
+    ? User.create({ name, about, avatar },/*  {
+      versionKey: false,
+    } */)
     : Promise.reject(UncorrectDataUserError))
     .then((user) => {
       user
@@ -48,7 +51,8 @@ const createUser = (req, res) => {
         : res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      console.log(err);
+      if (err.name === 'ValidationError' || err.name === 'UncorrectDataUserError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка запроса данных пользователя' });
