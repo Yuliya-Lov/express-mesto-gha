@@ -26,7 +26,7 @@ const getAllCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
   (name && link
-    ? Card.create({ name, link })
+    ? Card.create({ name, link, owner: req.user._id })
     : res.status(400).send({ message: UncorrectDataCardError.message }))
     .then((card) => res.send({ data: card }))
     .catch((err) => {
