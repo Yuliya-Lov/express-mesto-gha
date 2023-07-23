@@ -17,6 +17,7 @@ const getAllUsers = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
+  console.log(req.params.id)
   User.findById(req.params.id)
     .orFail()
     .then((user) => {
@@ -29,15 +30,20 @@ const createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => {
       User.create(
-        {
+       {
           email: req.body.email,
           password: hash,
           name: req.body.name,
           about: req.body.about,
           avatar: req.body.avatar,
-        },
+        }
       )
-        .then((user) => res.send({ data: user }))
+        .then((user) => res.send({
+          email: user.email,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+        }))
         .catch((err) => next(err));
     })
     .catch((err) => next(err));

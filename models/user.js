@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const {
-  HTTP_USER_STATUS_NOT_FOUND,
+  HTTP_STATUS_UNAUTHORIZED,
 } = require('../middlewares/errors');
 
 
@@ -36,16 +36,16 @@ const userSchema = new mongoose.Schema({
 
 userSchema.statics.findUserByCredentials = function ({ email, password }) {
   return this.findOne({ email })
-    .orFail()
+    .orFail(HTTP_STATUS_UNAUTHORIZED)
     .select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(HTTP_USER_STATUS_NOT_FOUND);
+        return Promise.reject(HTTP_STATUS_UNAUTHORIZED);
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(HTTP_USER_STATUS_NOT_FOUND);
+            return Promise.reject(HTTP_STATUS_UNAUTHORIZED);
           }
           return user;
         })

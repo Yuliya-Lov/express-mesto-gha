@@ -5,7 +5,8 @@ const {
 } = require('../middlewares/errors');
 
 const auth = (req, res, next) => {
-  console.log(req.cookies.jwt);
+  /* console.log(params);
+  console.log(headers); */
   let token;
   try {
     console.log('1');
@@ -25,8 +26,7 @@ const auth = (req, res, next) => {
   }
   console.log('6');
   req.user = payload;
-  console.log('7');
-  res.status(200).send({id: req.user._id });
+  console.log({ id: req.user._id });
   next();
 };
 

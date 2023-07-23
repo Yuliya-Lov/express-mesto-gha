@@ -37,12 +37,17 @@ app.post('/signup', celebrate({
     avatar: Joi.string().pattern(urlPattern),
   }).unknown(true),
 }), createUser);
-app.post('/signin', login);
-app.get('/users/me', /* celebrate({
-  params: Joi.object().keys({
-    cookies: Joi.object(),
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }).unknown(true),
+}), login);
+app.use('/users/me', celebrate({
+  cookies: Joi.object().keys({
+    jwt: Joi.string(),
   }),
-}), */ auth);
+}), auth);
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 app.use('*', () => Promise.reject(HTTP_STATUS_NOT_FOUND));

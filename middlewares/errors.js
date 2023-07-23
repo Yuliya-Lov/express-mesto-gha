@@ -24,8 +24,8 @@ const HTTP_CARD_STATUS_NOT_FOUND = {
 };
 const HTTP_STATUS_UNAUTHORIZED = {
   name: 'HTTP_STATUS_UNAUTHORIZED',
-  code: 404,
-  message: 'Необходима авторизация',
+  code: 401,
+  message: 'Неуспешная авторизация',
 };
 const HTTP_STATUS_CONFLICT = {
   name: 'HTTP_STATUS_CONFLICT',
@@ -39,7 +39,7 @@ const HTTP_STATUS_INTERNAL_SERVER_ERROR = {
 };
 
 const customErrors = (err, req, res, next) => {
-  //console.log("cusErr", err);
+  console.log("cusErr", err);
   if (err.name === 'ValidationError'
   || err.name === 'CastError'
   || err.name === 'HTTP_STATUS_BAD_REQUEST') {
