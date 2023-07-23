@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
-const { NODE_ENV, JWT_SECRET } = process.env;
+const JWT_SECRET = 'e46a78f1f6ce4aef33f41595a5d06a518b2f802e0e611d84f9eb22f2c87fa60b';
 const {
-  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_UNAUTHORIZED,
 } = require('../middlewares/errors');
 
 const auth = (req, res, next) => {
+  console.log(req.cookies.jwt);
   let token;
   try {
     console.log('1');
@@ -18,22 +19,18 @@ const auth = (req, res, next) => {
   let payload;
   try {
     console.log('4', token);
-    console.log(jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'));
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    console.log(err);
-    next(err);
-    return;
-    /*  JsonWebTokenError return Promise.reject(HTTP_STATUS_NOT_FOUND); */
-    /*  return res
-       .status(HTTP_STATUS_NOT_FOUND)
-       .send({ message: 'Необходима авторизация' }); */
+    next(HTTP_STATUS_UNAUTHORIZED);
   }
   console.log('6');
   req.user = payload;
-  res.send(req.user._id);
+  console.log('7');
+  res.status(200).send({id: req.user._id });
+  next();
 };
 
 module.exports = {
   auth,
+  JWT_SECRET,
 };
