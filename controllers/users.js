@@ -86,7 +86,6 @@ const updateUserInfo = (req, res, next) => {
 };
 
 const updateUserAvatar = (req, res, next) => {
-  conole.log('gggggggggg');
   User.findByIdAndUpdate(
     req.user._id,
     { avatar: req.body.avatar },
