@@ -18,7 +18,9 @@ const getAllCards = (req, res, next) => {
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res
+      .status(201)
+      .send({ data: card }))
     .catch((err) => next(err));
 };
 
@@ -29,7 +31,7 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         return next(HTTP_STATUS_FORBIDDEN);
       }
-      Card.findByIdAndDelete(req.params.id)
+      Card.deleteOne({ _id: req.params.id })
         .then(() => res.status(200).send({
           message: 'Карточка удалена',
         }))

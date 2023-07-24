@@ -39,12 +39,14 @@ const createUser = (req, res, next) => {
           avatar: req.body.avatar,
         },
       )
-        .then((user) => res.send({
-          email: user.email,
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-        }))
+        .then((user) => res
+          .status(201)
+          .send({
+            email: user.email,
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+          }))
         .catch((err) => next(err));
     })
     .catch((err) => next(err));
