@@ -5,7 +5,13 @@ const {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_UNAUTHORIZED,
 } = require('../middlewares/errors');
-const { JWT_SECRET } = require('../middlewares/auth');
+const {
+  createToken,
+  checkToken
+} = require('../utils/token');
+const {
+  auth
+} = require('../middlewares/auth');
 
 const getAllUsers = (req, res, next) => {
   User.find({})
@@ -30,7 +36,7 @@ const createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => {
       User.create(
-       {
+        {
           email: req.body.email,
           password: hash,
           name: req.body.name,
@@ -49,23 +55,22 @@ const createUser = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+const authMe = (req, res) => {
+    res.status(200). send(req.user);
+}
+
 const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentials({ email, password })
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        JWT_SECRET,
-      );
-      /*  res.send({
-         data: token,
-       }); */
+      const token = createToken({ _id: user._id });
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
-        })
-        .end();
+        }).send({
+          data: token,
+        });
     })
     .catch((err) => next(err));
 };
@@ -100,5 +105,6 @@ module.exports = {
   createUser,
   updateUserInfo,
   updateUserAvatar,
+  authMe,
   login,
 };

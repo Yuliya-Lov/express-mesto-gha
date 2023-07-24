@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 require('dotenv').config();
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
@@ -23,10 +24,10 @@ mongoose.connect('mongodb://0.0.0.0:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use(cookieParser());
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(cors());
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -37,19 +38,16 @@ app.post('/signup', celebrate({
     avatar: Joi.string().pattern(urlPattern),
   }).unknown(true),
 }), createUser);
+
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }).unknown(true),
 }), login);
-app.use('/users/me', celebrate({
-  cookies: Joi.object().keys({
-    jwt: Joi.string(),
-  }),
-}), auth);
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
+
+app.use('/users', auth, userRouter);
+app.use('/cards', auth, cardRouter);
 app.use('*', () => Promise.reject(HTTP_STATUS_NOT_FOUND));
 app.use(errors());
 app.use((err, req, res, next) => customErrors(err, req, res, next));

@@ -30,5 +30,6 @@
       "error",
       "unix"
     ]
-  }
+  },
+  "no-control-regex": "off"
 }
