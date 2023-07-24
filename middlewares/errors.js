@@ -19,6 +19,12 @@ const HTTP_STATUS_UNAUTHORIZED = {
   code: 401,
   message: 'Неуспешная авторизация',
 };
+
+const HTTP_STATUS_FORBIDDEN = {
+  name: 'HTTP_STATUS_FORBIDDEN',
+  code: 403,
+  message: 'Доступ запрещен',
+};
 const HTTP_STATUS_CONFLICT = {
   name: 'HTTP_STATUS_CONFLICT',
   code: 409,
@@ -44,6 +50,10 @@ const customErrors = (err, req, res, next) => {
     res
       .status(HTTP_USER_STATUS_NOT_FOUND.code)
       .send({ message: err.message });
+  } else if(err.name === 'HTTP_STATUS_FORBIDDEN') {
+    res
+    .status(HTTP_STATUS_FORBIDDEN.code)
+    .send({ message: err.message });
   } else if (err.name === 'HTTP_STATUS_UNAUTHORIZED'
   || err.name === 'JsonWebTokenError') {
     res.status(HTTP_STATUS_UNAUTHORIZED.code).send({ message: HTTP_STATUS_UNAUTHORIZED.message });
@@ -64,6 +74,7 @@ module.exports = {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_USER_STATUS_NOT_FOUND,
   HTTP_CARD_STATUS_NOT_FOUND,
+  HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_UNAUTHORIZED,
   HTTP_STATUS_CONFLICT,

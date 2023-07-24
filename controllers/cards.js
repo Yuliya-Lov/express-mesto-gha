@@ -1,8 +1,6 @@
 const Card = require('../models/card');
 const {
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_CARD_STATUS_NOT_FOUND,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
+  HTTP_STATUS_FORBIDDEN
 } = require('../middlewares/errors');
 
 const getAllCards = (req, res, next) => {
@@ -10,8 +8,8 @@ const getAllCards = (req, res, next) => {
     .then((cards) => {
       res.send({ data: cards });
     })
-    .catch(() => {
-      next(HTTP_STATUS_INTERNAL_SERVER_ERROR);
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -23,9 +21,18 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findById(req.params.id)
     .orFail()
-    .then((card) => { res.send({ data: card }); })
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        return next(HTTP_STATUS_FORBIDDEN);
+      }
+      Card.findByIdAndDelete(req.params.id)
+        .then(() => res.status(200).send({
+          message: 'Карточка удалена'
+        }))
+        .catch((err) => next(err));
+    })
     .catch((err) => next(err));
 };
 
@@ -36,11 +43,7 @@ const likeCard = (req, res, next) => {
     { new: true },
   )
     .orFail()
-    .then((card) => {
-      card
-        ? res.send({ data: card })
-        : res.status(404).send({ message: 'Карточка  с указанным _id не найдена' });
-    })
+    .then((card) =>  res.status(200).send({ data: card }))
     .catch((err) => next(err));
 };
 
@@ -51,9 +54,7 @@ const dislikeCard = (req, res, next) => {
     { new: true },
   )
     .orFail()
-    .then((card) => {
-      res.send({ data: card });
-    })
+    .then((card) =>  res.status(200).send({ data: card }))
     .catch((err) => next(err));
 };
 

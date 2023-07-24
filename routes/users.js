@@ -10,7 +10,7 @@ const {
 } = require('../controllers/users');
 const urlPattern = /^https?:\/\/(www.)?[a-zA-Z0-9\-\.~:\/\?#\[\]@!\$&'\()\*\+,;=]{2,}\.[a-zA-Z]{2,}/;
 
-userRouter.get('/', auth, getAllUsers);
+userRouter.get('/', getAllUsers);
 
 userRouter.get('/me',  celebrate({
   body: Joi.object().keys({

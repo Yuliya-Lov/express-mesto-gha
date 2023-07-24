@@ -17,7 +17,6 @@ const getAllUsers = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  console.log(req.params.id)
   User.findById(req.params.id)
     .orFail()
     .then((user) => {
@@ -49,8 +48,13 @@ const createUser = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-const authMe = (req, res) => {
-    res.status(200). send(req.user);
+const authMe = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail()
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => next(err));
 }
 
 const login = (req, res, next) => {
