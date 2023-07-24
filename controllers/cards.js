@@ -1,7 +1,8 @@
 const Card = require('../models/card');
 const {
-  HTTP_STATUS_FORBIDDEN
-} = require('../middlewares/errors');
+  HTTP_STATUS_FORBIDDEN,
+  HTTP_CARD_STATUS_NOT_FOUND
+} = require('../utils/errors');
 
 const getAllCards = (req, res, next) => {
   Card.find({})
@@ -22,7 +23,7 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   Card.findById(req.params.id)
-    .orFail()
+    .orFail(HTTP_CARD_STATUS_NOT_FOUND)
     .then((card) => {
       if (card.owner.toString() !== req.user._id) {
         return next(HTTP_STATUS_FORBIDDEN);

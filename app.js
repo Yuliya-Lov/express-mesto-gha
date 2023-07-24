@@ -14,9 +14,9 @@ const { userRouter } = require('./routes/users');
 const { cardRouter } = require('./routes/cards');
 const {auth} = require('./middlewares/auth');
 const {
-  HTTP_STATUS_NOT_FOUND,
+  HTTP_PAGE_STATUS_NOT_FOUND,
   customErrors,
-} = require('./middlewares/errors');
+} = require('./utils/errors');
 const urlPattern = /^https?:\/\/(www.)?[a-zA-Z0-9\-\.~:\/\?#\[\]@!\$&'\()\*\+,;=]/;
 
 
@@ -56,7 +56,9 @@ app.use('/cards', celebrate({
     jwt: Joi.string(),
   }),
 }), auth, cardRouter);
-app.use('*', () => Promise.reject(HTTP_STATUS_NOT_FOUND));
+app.use('/*', (req, res, next) => {
+  next(HTTP_PAGE_STATUS_NOT_FOUND)
+});
 app.use(errors());
 app.use((err, req, res, next) => customErrors(err, req, res, next));
 

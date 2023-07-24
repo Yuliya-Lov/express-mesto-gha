@@ -1,6 +1,6 @@
 const {
   HTTP_STATUS_UNAUTHORIZED,
-} = require('../middlewares/errors');
+} = require('../utils/errors');
 const {
   checkToken
 } =  require('../utils/token');

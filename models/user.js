@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const {
   HTTP_STATUS_UNAUTHORIZED,
-} = require('../middlewares/errors');
+} = require('../utils/errors');
 
 
 const userSchema = new mongoose.Schema({

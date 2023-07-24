@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const {
   HTTP_STATUS_BAD_REQUEST,
-} = require('../middlewares/errors');
+} = require('../utils/errors');
 const {
   createToken
 } = require('../utils/token');

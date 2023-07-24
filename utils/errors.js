@@ -14,6 +14,11 @@ const HTTP_CARD_STATUS_NOT_FOUND = {
   code: 404,
   message: 'Карточка не найдена',
 };
+const HTTP_PAGE_STATUS_NOT_FOUND = {
+  name: 'HTTP_CARD_STATUS_NOT_FOUND',
+  code: 404,
+  message: 'Страница не найдена',
+};
 const HTTP_STATUS_UNAUTHORIZED = {
   name: 'HTTP_STATUS_UNAUTHORIZED',
   code: 401,
@@ -46,9 +51,10 @@ const customErrors = (err, req, res, next) => {
       .send({ message: HTTP_STATUS_BAD_REQUEST.message });
   } else if (err.name === 'DocumentNotFoundError'
   || err.name === 'HTTP_USER_STATUS_NOT_FOUND'
-  || err.name === 'HTTP_CARD_STATUS_NOT_FOUND') {
+  || err.name === 'HTTP_CARD_STATUS_NOT_FOUND'
+  || err.name === 'HTTP_PAGE_STATUS_NOT_FOUND') {
     res
-      .status(HTTP_USER_STATUS_NOT_FOUND.code)
+      .status(err.code)
       .send({ message: err.message });
   } else if(err.name === 'HTTP_STATUS_FORBIDDEN') {
     res
@@ -74,6 +80,7 @@ module.exports = {
   HTTP_STATUS_BAD_REQUEST,
   HTTP_USER_STATUS_NOT_FOUND,
   HTTP_CARD_STATUS_NOT_FOUND,
+  HTTP_PAGE_STATUS_NOT_FOUND,
   HTTP_STATUS_FORBIDDEN,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_UNAUTHORIZED,
