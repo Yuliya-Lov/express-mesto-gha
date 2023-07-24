@@ -1,7 +1,8 @@
+/* eslint-disable consistent-return */
 const Card = require('../models/card');
 const {
   HTTP_STATUS_FORBIDDEN,
-  HTTP_CARD_STATUS_NOT_FOUND
+  HTTP_CARD_STATUS_NOT_FOUND,
 } = require('../utils/errors');
 
 const getAllCards = (req, res, next) => {
@@ -30,7 +31,7 @@ const deleteCard = (req, res, next) => {
       }
       Card.findByIdAndDelete(req.params.id)
         .then(() => res.status(200).send({
-          message: 'Карточка удалена'
+          message: 'Карточка удалена',
         }))
         .catch((err) => next(err));
     })
@@ -44,7 +45,7 @@ const likeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(HTTP_CARD_STATUS_NOT_FOUND)
-    .then((card) =>  res.status(200).send({ data: card }))
+    .then((card) => res.status(200).send({ data: card }))
     .catch((err) => next(err));
 };
 
@@ -55,7 +56,7 @@ const dislikeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(HTTP_CARD_STATUS_NOT_FOUND)
-    .then((card) =>  res.status(200).send({ data: card }))
+    .then((card) => res.status(200).send({ data: card }))
     .catch((err) => next(err));
 };
 

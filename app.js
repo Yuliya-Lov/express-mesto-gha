@@ -10,15 +10,13 @@ const { PORT = 3000 } = process.env;
 const app = express();
 const bodyParser = require('body-parser');
 const { createUser, login } = require('./controllers/users');
-const { userRouter } = require('./routes/users');
+const { userRouter, urlPattern } = require('./routes/users');
 const { cardRouter } = require('./routes/cards');
-const {auth} = require('./middlewares/auth');
+const { auth } = require('./middlewares/auth');
 const {
   HTTP_PAGE_STATUS_NOT_FOUND,
   customErrors,
 } = require('./utils/errors');
-const urlPattern = /^https?:\/\/(www.)?[a-zA-Z0-9\-\.~:\/\?#\[\]@!\$&'\()\*\+,;=]/;
-
 
 mongoose.connect('mongodb://0.0.0.0:27017/mestodb', {
   useNewUrlParser: true,
@@ -57,7 +55,7 @@ app.use('/cards', celebrate({
   }),
 }), auth, cardRouter);
 app.use('/*', (req, res, next) => {
-  next(HTTP_PAGE_STATUS_NOT_FOUND)
+  next(HTTP_PAGE_STATUS_NOT_FOUND);
 });
 app.use(errors());
 app.use((err, req, res, next) => customErrors(err, req, res, next));

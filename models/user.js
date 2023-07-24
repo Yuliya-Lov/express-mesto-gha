@@ -4,7 +4,6 @@ const {
   HTTP_STATUS_UNAUTHORIZED,
 } = require('../utils/errors');
 
-
 const userSchema = new mongoose.Schema({
   name: {
     type: String,

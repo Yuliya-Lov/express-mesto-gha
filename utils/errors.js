@@ -42,26 +42,25 @@ const HTTP_STATUS_INTERNAL_SERVER_ERROR = {
 };
 
 const customErrors = (err, req, res, next) => {
-  console.log("cusErr", err);
   if (err.name === 'ValidationError'
-  || err.name === 'CastError'
-  || err.name === 'HTTP_STATUS_BAD_REQUEST') {
+    || err.name === 'CastError'
+    || err.name === 'HTTP_STATUS_BAD_REQUEST') {
     res
       .status(HTTP_STATUS_BAD_REQUEST.code)
       .send({ message: HTTP_STATUS_BAD_REQUEST.message });
   } else if (err.name === 'DocumentNotFoundError'
-  || err.name === 'HTTP_USER_STATUS_NOT_FOUND'
-  || err.name === 'HTTP_CARD_STATUS_NOT_FOUND'
-  || err.name === 'HTTP_PAGE_STATUS_NOT_FOUND') {
+    || err.name === 'HTTP_USER_STATUS_NOT_FOUND'
+    || err.name === 'HTTP_CARD_STATUS_NOT_FOUND'
+    || err.name === 'HTTP_PAGE_STATUS_NOT_FOUND') {
     res
       .status(err.code)
       .send({ message: err.message });
-  } else if(err.name === 'HTTP_STATUS_FORBIDDEN') {
+  } else if (err.name === 'HTTP_STATUS_FORBIDDEN') {
     res
-    .status(HTTP_STATUS_FORBIDDEN.code)
-    .send({ message: err.message });
+      .status(HTTP_STATUS_FORBIDDEN.code)
+      .send({ message: err.message });
   } else if (err.name === 'HTTP_STATUS_UNAUTHORIZED'
-  || err.name === 'JsonWebTokenError') {
+    || err.name === 'JsonWebTokenError') {
     res.status(HTTP_STATUS_UNAUTHORIZED.code).send({ message: HTTP_STATUS_UNAUTHORIZED.message });
   } else if (err.name === 'MongoServerError') {
     res

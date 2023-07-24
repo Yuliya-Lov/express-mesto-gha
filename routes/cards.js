@@ -8,15 +8,18 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 
+// eslint-disable-next-line
+const urlPattern = /^https?:\/\/(www.)?[a-zA-Z0-9\-\.~:\/\?#\[\]@!\$&'\()\*\+,;=]{2,}\.[a-zA-Z]{2,}/;
+
 cardRouter.get('/', getAllCards);
 
 cardRouter.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().pattern(/^https?:\/\/(www.)?[a-zA-Z0-9\-\.~:\/\?#\[\]@!\$&'\()\*\+,;=]{2,}\.[a-zA-Z]{2,}/).required(),
-    owner: Joi.string().hex().length(24)
+    link: Joi.string().pattern(urlPattern).required(),
+    owner: Joi.string().hex().length(24),
   }).unknown(true),
-}),createCard);
+}), createCard);
 
 cardRouter.delete('/:id', celebrate({
   params: Joi.object().keys({

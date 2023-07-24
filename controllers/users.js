@@ -1,11 +1,12 @@
+/* eslint-disable consistent-return */
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const {
   HTTP_STATUS_BAD_REQUEST,
-  HTTP_USER_STATUS_NOT_FOUND
+  HTTP_USER_STATUS_NOT_FOUND,
 } = require('../utils/errors');
 const {
-  createToken
+  createToken,
 } = require('../utils/token');
 
 const getAllUsers = (req, res, next) => {
@@ -36,7 +37,7 @@ const createUser = (req, res, next) => {
           name: req.body.name,
           about: req.body.about,
           avatar: req.body.avatar,
-        }
+        },
       )
         .then((user) => res.send({
           email: user.email,
@@ -56,7 +57,7 @@ const authMe = (req, res, next) => {
       res.send({ data: user });
     })
     .catch((err) => next(err));
-}
+};
 
 const login = (req, res, next) => {
   const { email, password } = req.body;

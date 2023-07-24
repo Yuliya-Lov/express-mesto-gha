@@ -1,6 +1,5 @@
 const userRouter = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const {auth} = require('../middlewares/auth')
 const {
   getAllUsers,
   getUser,
@@ -8,11 +7,13 @@ const {
   updateUserInfo,
   updateUserAvatar,
 } = require('../controllers/users');
+
+// eslint-disable-next-line
 const urlPattern = /^https?:\/\/(www.)?[a-zA-Z0-9\-\.~:\/\?#\[\]@!\$&'\()\*\+,;=]{2,}\.[a-zA-Z]{2,}/;
 
 userRouter.get('/', getAllUsers);
 
-userRouter.get('/me',  celebrate({
+userRouter.get('/me', celebrate({
   body: Joi.object().keys({
     user: Joi.object().keys({
       _id: Joi.string(),
@@ -39,4 +40,4 @@ userRouter.patch('/me/avatar', celebrate({
   }).unknown(true),
 }), updateUserAvatar);
 
-module.exports = { userRouter };
+module.exports = { userRouter, urlPattern };
