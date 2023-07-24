@@ -43,7 +43,7 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail()
+    .orFail(HTTP_CARD_STATUS_NOT_FOUND)
     .then((card) =>  res.status(200).send({ data: card }))
     .catch((err) => next(err));
 };
@@ -54,7 +54,7 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail()
+    .orFail(HTTP_CARD_STATUS_NOT_FOUND)
     .then((card) =>  res.status(200).send({ data: card }))
     .catch((err) => next(err));
 };

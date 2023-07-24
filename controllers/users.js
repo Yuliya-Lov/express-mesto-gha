@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const {
   HTTP_STATUS_BAD_REQUEST,
+  HTTP_USER_STATUS_NOT_FOUND
 } = require('../utils/errors');
 const {
   createToken
@@ -18,7 +19,7 @@ const getAllUsers = (req, res, next) => {
 
 const getUser = (req, res, next) => {
   User.findById(req.params.id)
-    .orFail()
+    .orFail(HTTP_USER_STATUS_NOT_FOUND)
     .then((user) => {
       res.send({ data: user });
     })

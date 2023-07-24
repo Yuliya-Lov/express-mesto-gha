@@ -6,7 +6,7 @@ const HTTP_STATUS_BAD_REQUEST = {
 const HTTP_USER_STATUS_NOT_FOUND = {
   name: 'HTTP_USER_STATUS_NOT_FOUND',
   code: 404,
-  message: 'Неправильные почта или пароль',
+  message: 'Пользователь не найден',
 };
 
 const HTTP_CARD_STATUS_NOT_FOUND = {
