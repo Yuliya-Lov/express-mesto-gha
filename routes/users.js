@@ -13,8 +13,10 @@ const urlPattern = /^https?:\/\/(www.)?[a-zA-Z0-9\-\.~:\/\?#\[\]@!\$&'\()\*\+,;=
 userRouter.get('/', auth, getAllUsers);
 
 userRouter.get('/me',  celebrate({
-  cookies: Joi.object().keys({
-    jwt: Joi.string(),
+  body: Joi.object().keys({
+    user: Joi.object().keys({
+      _id: Joi.string(),
+    }),
   }),
 }), authMe);
 

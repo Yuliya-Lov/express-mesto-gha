@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const {
   HTTP_STATUS_UNAUTHORIZED,
 } = require('../middlewares/errors');

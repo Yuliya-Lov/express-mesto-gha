@@ -46,8 +46,16 @@ app.post('/signin', celebrate({
   }).unknown(true),
 }), login);
 
-app.use('/users', auth, userRouter);
-app.use('/cards', auth, cardRouter);
+app.use('/users', celebrate({
+  cookies: Joi.object().keys({
+    jwt: Joi.string(),
+  }),
+}), auth, userRouter);
+app.use('/cards', celebrate({
+  cookies: Joi.object().keys({
+    jwt: Joi.string(),
+  }),
+}), auth, cardRouter);
 app.use('*', () => Promise.reject(HTTP_STATUS_NOT_FOUND));
 app.use(errors());
 app.use((err, req, res, next) => customErrors(err, req, res, next));

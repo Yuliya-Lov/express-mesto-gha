@@ -1,17 +1,11 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {
   HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_UNAUTHORIZED,
 } = require('../middlewares/errors');
 const {
-  createToken,
-  checkToken
+  createToken
 } = require('../utils/token');
-const {
-  auth
-} = require('../middlewares/auth');
 
 const getAllUsers = (req, res, next) => {
   User.find({})

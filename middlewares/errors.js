@@ -1,11 +1,3 @@
-/* const {
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_UNAUTHORIZED,
-  HTTP_STATUS_CONFLICT,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
-} = require('http2').constants; */
-
 const HTTP_STATUS_BAD_REQUEST = {
   name: 'HTTP_STATUS_BAD_REQUEST',
   code: 400,
@@ -67,23 +59,6 @@ const customErrors = (err, req, res, next) => {
 
   next();
 };
-
-/* const customErrors = (err, req, res, next) => {
-  console.log( "cusErr", err)
-  if (err.name === 'ValidationError' || err.name === 'CastError' || err.name === 'HTTP_STATUS_BAD_REQUEST') {
-    res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
-  } else if (err.name === 'DocumentNotFoundError' || err.name === 'HTTP_STATUS_NOT_FOUND') {
-    res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указанным id не найденa' });
-  } else if (err.name === 'HTTP_STATUS_UNAUTHORIZED' || err.name === 'JsonWebTokenError') {
-    res.status(HTTP_STATUS_UNAUTHORIZED).send({ message: 'Необходима авторизация!' });
-  } else if (err.name === 'MongoServerError') {
-    res.status(HTTP_STATUS_CONFLICT).send({ message: 'Пользователь с таким email уже зарегистрирован!' });
-  } else {
-    res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
-  }
-
-  next();
-}; */
 
 module.exports = {
   HTTP_STATUS_BAD_REQUEST,
