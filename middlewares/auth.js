@@ -7,6 +7,7 @@ const {
 } = require('../utils/token');
 
 const auth = (req, res, next) => {
+  // Ошибка при получении user была, т.к. токен был не из моей работы и назван был token, у меня jwt
   if (!req.cookies.jwt) {
     return next(HTTP_STATUS_UNAUTHORIZED);
   }
